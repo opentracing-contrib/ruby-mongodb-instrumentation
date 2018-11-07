@@ -1,14 +1,19 @@
 require "mongodb/instrumentation/version"
 require "mongodb/instrumentation/command_subscriber"
 
+require "opentracing"
+
 module MongoDB
   module Instrumentation
 
     class << self
 
-      def instrument(**args)
+      attr_accessor :tracer
 
-        Mongo::Monitoring::Global.subscribe(Mongo::Monitoring::COMMAND, MongoDB::Instrumentation::CommandSubscriber.new)
+      def instrument(tracer: nil)
+        @tracer = tracer || OpenTracing.global_tracer
+
+        Mongo::Monitoring::Global.subscribe(Mongo::Monitoring::COMMAND, MongoDB::Instrumentation::CommandSubscriber.new(@tracer))
       end
     end
   end
