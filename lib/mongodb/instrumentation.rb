@@ -1,7 +1,15 @@
 require "mongodb/instrumentation/version"
+require "mongodb/instrumentation/command_subscriber"
 
-module Mongodb
+module MongoDB
   module Instrumentation
-    # Your code goes here...
+
+    class << self
+
+      def instrument(**args)
+
+        Mongo::Monitoring::Global.subscribe(Mongo::Monitoring::COMMAND, MongoDB::Instrumentation::CommandSubscriber.new)
+      end
+    end
   end
 end
