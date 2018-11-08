@@ -1,20 +1,14 @@
-require 'pp'
-require 'opentracing'
 module MongoDB
   module Instrumentation
     class CommandSubscriber
 
-      @operations
-
-      def initialize(tracer: tracer)
+      def initialize(tracer: OpenTracing.global_tracer)
         @tracer = tracer
 
         @requests = {}
       end
 
       def started(event)
-        # todo how to handle operations and multiple operations per 
-
         # start command span
         tags = {
           # opentracing tags
@@ -32,39 +26,26 @@ module MongoDB
         span =@tracer.start_span(event.command_name, tags: tags)
 
         @requests[event.request_id] = span
-        
-        puts ""
-        puts event.command
-        puts "#{event.operation_id} #{event.request_id}"
-        puts "started"
       end
 
       def succeeded(event)
+        # tag the reported duration, in case it differs from what we saw
+        # through the notifications times
         span = @requests[event.request_id]
-        span.finish()
+        span.set_tag("duration", event.duration)
 
-        puts event.duration
-        puts event.reply
-        puts "#{event.operation_id} #{event.request_id}"
-        puts "succeeded"
+        span.finish()
       end
 
       def failed(event)
+        # tag the reported duration and any error message that came through
         span = @requests[event.request_id]
-
+        span.tag("duration", event.duration)
         span.set_tag("error", true)
+        span.log_kv("message", event.message)
+
         span.finish()
-
-        puts event.duration
-        puts event.reply
-        puts "#{event.operation_id} #{event.request_id}"
-        puts "failed"
       end
-
-      private
-      def finish_span(event, tags)
-      end
-
     end
   end
 end
