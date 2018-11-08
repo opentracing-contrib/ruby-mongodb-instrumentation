@@ -2,6 +2,8 @@ module MongoDB
   module Instrumentation
     class CommandSubscriber
 
+      attr_reader :requests
+
       def initialize(tracer: OpenTracing.global_tracer)
         @tracer = tracer
 
@@ -29,22 +31,28 @@ module MongoDB
       end
 
       def succeeded(event)
+        return if @requests[event.request_id].nil?
+
         # tag the reported duration, in case it differs from what we saw
         # through the notifications times
         span = @requests[event.request_id]
         span.set_tag("duration", event.duration)
 
         span.finish()
+        @requests.delete(event.request_id)
       end
 
       def failed(event)
+        return if @requests[event.request_id].nil?
+
         # tag the reported duration and any error message that came through
         span = @requests[event.request_id]
-        span.tag("duration", event.duration)
+        span.set_tag("duration", event.duration)
         span.set_tag("error", true)
-        span.log_kv("message", event.message)
+        span.log_kv(key: "message", value: event.message)
 
         span.finish()
+        @requests.delete(event.request_id)
       end
     end
   end
