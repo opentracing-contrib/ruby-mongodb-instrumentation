@@ -36,7 +36,7 @@ module MongoDB
         # tag the reported duration, in case it differs from what we saw
         # through the notifications times
         span = @requests[event.request_id]
-        span.set_tag("took.s", event.duration)
+        span.set_tag("took.ms", event.duration * 1000)
 
         span.finish()
         @requests.delete(event.request_id)
@@ -47,7 +47,7 @@ module MongoDB
 
         # tag the reported duration and any error message that came through
         span = @requests[event.request_id]
-        span.set_tag("took.s", event.duration)
+        span.set_tag("took.ms", event.duration * 1000)
         span.set_tag("error", true)
         span.log_kv(key: "message", value: event.message)
 
