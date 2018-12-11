@@ -2,6 +2,11 @@
 
 This gem provides auto-instrumentation for the MongoDB Ruby Driver by subscribing to Monitoring notifications.
 
+## Supported Versions
+
+- MRI 2.0 and newer
+- mongo 2.1 and newer
+
 ## Installation
 
 Add this line to your application's Gemfile:
