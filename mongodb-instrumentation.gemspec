@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{Instrumentation for MongoDB}
   spec.description   = %q{OpenTracing auto-instrumentation for applications using the MongoDB Ruby driver.}
   spec.homepage      = "http://github.com/signalfx/ruby-mongodb-instrumentation"
-  spec.license       = "MIT"
+  spec.license       = "Apache-2.0"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
