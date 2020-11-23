@@ -64,8 +64,11 @@ RSpec.describe MongoDB::Instrumentation::CommandSubscriber do
       expect(tracer.spans.last.finished?).to be true
 
       # there should be an error tag and message log
-      expect(tracer.spans.last.tags["error"]).to be true
-      expect(tracer.spans.last.logs.count).to be 1
+      span = tracer.spans.last
+      puts span.tags
+      expect(span.tags["error"]).to be true
+      expect(span.tags["sfx.error.message"]).to eq "error"
+      expect(span.tags["sfx.error.kind"]).to eq "MongoDB::Instrumentation::Error"
     end
 
     it "ignores request ids that haven't been started" do
